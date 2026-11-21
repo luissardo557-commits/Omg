@@ -60,6 +60,10 @@ def text_img(text, size, fill, stroke, maxw, spacing=1.12):
         dr.text((x, pad + i * lh), l, font=font, fill=fill, stroke_width=stroke, stroke_fill=(0, 0, 0, 255))
     return im
 
+if len(sys.argv) > 4 and sys.argv[4].endswith('.json'):
+    import json
+    SUBS = [(a, b, SUBS[i][2]) for a, b, i in json.load(open(sys.argv[4]))]
+
 head_imgs = [(a, b, text_img(s, 112, (255, 214, 64, 255), 10, 960)) for a, b, s in HEAD]
 sub_imgs = [(a, b, text_img(s, 62, (255, 255, 255, 255), 7, 940)) for a, b, s in SUBS]
 
