@@ -65,8 +65,10 @@ while x < END - 1.0:
 for kk in ('A1', 'B2', 'C1', 'A4'):
     for j, m in enumerate([76, 79, 83]): add(mus, S[kk][0] + 0.2 + j * 0.18, tone(note(m), 1.2, 3), 0.06)
 # golpe de gancho, whooshes en cortes
-add(sfx, 0.85, whoosh(0.9), 1.2)
-add(sfx, 0.95, boom(2.5, 45), 0.9)
+# gancho: siseo, ataque de la serpiente a cámara, golpe y whoosh
+add(sfx, 0.05, hiss(0.7), 0.7)
+add(sfx, 0.5, whoosh(0.25), 1.4); add(sfx, 0.6, boom(2.5, 45), 1.4); add(sfx, 0.6, hiss(0.6), 1.0)
+add(sfx, 1.05, whoosh(0.9), 1.0)
 for kk, a, b in SH[1:]: add(sfx, a - 0.25, whoosh(0.5), 0.5)
 # barco de la Marina: bocina
 a = S['A2'][0]
@@ -124,7 +126,7 @@ subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', VOZ, '-i', bedp, '-f
 # ------------------------------------------------------------------ texto
 HL = {'BRASIL', 'PROHIBIDO', 'HUMANOS', 'QUEIMADA', 'GRANDE', 'MARINA', 'CIENTÍFICOS', 'REGLAS', 'ROCAS', 'SERPIENTES',
       'VENENOSAS', 'AQUÍ', 'ATRAPADAS', 'MAR', 'CONTINENTE', 'AVES', 'VENENO', 'RÁPIDO', 'FARO', 'SOLO', 'MILLÓN', 'TÚ',
-      'SÍ', 'NO', 'VISTE', 'MILES', 'DORADA', 'EXTRAÑO', 'PELIGROSA'}
+      'SÍ', 'NO', 'VISTE', 'MILES', 'DORADA', 'EXTRAÑO', 'PELIGROSA', 'BARCO', 'ÚLTIMO', 'MILLÓN', 'SUELO', 'RAZÓN'}
 def chunks():
     out = []
     for l in lines:
@@ -181,6 +183,17 @@ for f in range(nf):
     src = fr[min(len(fr) - 1, int(u * len(fr)))]
     img = Image.open(src).convert('RGB').resize((W, H), Image.LANCZOS).convert('RGBA')
     # rótulos
+    if k == 'A1':
+        ua = (g - a) / (b - a) * 5.92
+        if 0.55 <= ua < 0.75:
+            fl = 1 - (ua - 0.55) / 0.2
+            img = Image.blend(img, Image.new('RGBA', (W, H), (255, 255, 255, 255)), 0.6 * fl)
+        if 0.65 <= ua < 3.4:
+            age = ua - 0.65; al = min(1.0, age / 0.1) * (1 - sm((ua - 3.0) / 0.4))
+            sc = 1.35 - 0.35 * min(1.0, age / 0.15)
+            Fb = ImageFont.truetype(FONT, int(150 * sc))
+            tag(img, '¡NO TE', W / 2 + 6 * math.sin(g * 70) * max(0, 1 - age * 3), 360, Fb, al, (255, 255, 255))
+            tag(img, 'BAJES!', W / 2 + 6 * math.sin(g * 60) * max(0, 1 - age * 3), 520, Fb, al, (235, 40, 40))
     if k == 'A2' and g - a < 3.5:
         al = sm((g - a - 0.3) / 0.3) * (1 - sm((g - a - 3.0) / 0.4))
         if al > 0: tag(img, 'ILHA DA QUEIMADA GRANDE', W / 2, 330, F60, al, (255, 210, 63)); tag(img, 'SÃO PAULO · BRASIL', W / 2, 400, F60, al)

@@ -449,12 +449,22 @@ def A1():
     def anim(t):
         sea_time(t); beam.rotation_euler.z = t * 1.2
         boat_motion(bt, t, y=-18 + t * 0.5)
-        hs.set(path_coil(hb, t, raise_head=0.1, phase=1.0, look=-1.9), tongue=1.0 if 0.4 < t < 0.7 else 0.0)
+        # GANCHO: la serpiente escondida salta hacia la cámara (0.45-0.7 s) y vuelve
+        camp = V(-1.2, -0.6, 2.0)
+        lunge = sm((t - 0.45) / 0.22) * (1 - sm((t - 1.1) / 0.6))
+        pts = path_coil(hb, t, raise_head=0.1 + 0.3 * sm((t - 0.3) / 0.15), phase=1.0, look=-1.9)
+        dirc = (camp - hb); dirc.z *= 0.15; dirc = dirc.normalized()
+        pts = [q + dirc * (0.75 * lunge * sm((i / (Snake.N - 1) - 0.5) / 0.5)) + V(0, 0, 0.12 * lunge * sm((i / (Snake.N - 1) - 0.6) / 0.4)) for i, q in enumerate(pts)]
+        hs.set(pts, tongue=1.0 if 0.3 < t < 1.0 else 0.0)
         for k, tf in enumerate(tufts[:40]): tf.rotation_euler = (0.08 * math.sin(t * 3 + k), 0, 0)
         on_boat(bt, captain, 0, armR=(-0.5, 0.3, 0, -1.4), look=(0, 0.3), wide=sm((t - 4.0) / 0.3), browup=sm((t - 4.0) / 0.3))
         on_boat(bt, girl, 1, look=(0, 0.5))
         on_boat(bt, tourist, 2, squint=0.5, smile=1.0, armL=(-1.2, -0.2, 0, -1.4))
-        if t < 0.9: p = V(-1.2, -0.6, 2.0) + V(0.05 * t, -0.1 * t, 0); g = V(0.9, 4.1, 0.6)
+        if t < 0.9:
+            rush = sm((t - 0.4) / 0.28)
+            head = pts[-1]
+            near = head + dirc * (0.55 - 0.25 * lunge) + V(0, 0, 0.06)
+            p = V(-1.2, -0.6, 2.0).lerp(near, rush) + shake(t, 0.62, 0.3, 0.03); g = V(0.9, 4.1, 0.6).lerp(head, rush)
         elif t < 2.6:
             u = eo((t - 0.9) / 1.7); p = V(-1.15, -0.7, 2.0).lerp(V(-6, -46, 22), u); g = V(0.9, 4.1, 0.6).lerp(V(0, 22, 4), u)
         else:
