@@ -620,57 +620,64 @@ def C2():
         cam.location = (mp + V(5.0, 6.5, 1.2)).lerp(mp + V(2.4, 3.2, 0.5), u); tgt.location = mp
     return anim
 
-def branch_set(gz):
+def branch_set():
     T = mat('#6B4A2B', 0.9)
-    prim('cylinder', (3.4, 6, gz + 1.4), m=T, vertices=8, radius=0.2, depth=2.8)
-    prim('cylinder', (4.6, 6, gz + 2.3), rot=(0, PI / 2, 0), m=T, vertices=8, radius=0.09, depth=2.6)
-    prim('cylinder', (7.6, 6, gz + 1.25), m=T, vertices=6, radius=0.1, depth=2.5)
-    for k in range(3): prim('ico_sphere', (3.2 + k * 0.4, 6.3, gz + 3.2), m=mat('#2F6E2B', 0.8), subdivisions=1, radius=1.0)
+    prim('ico_sphere', (10.6, -1.0, -0.6), scale=(2.4, 1.8, 1.3), m=mat('#A39885', 0.9), subdivisions=2, radius=1)
+    prim('cylinder', (10.0, -1.0, 2.0), m=T, vertices=8, radius=0.2, depth=2.8)
+    prim('cylinder', (11.3, -1.0, 2.9), rot=(0, PI / 2, 0), m=T, vertices=8, radius=0.09, depth=2.6)
+    prim('cylinder', (9.6, -1.0, 3.1), rot=(0, -0.9, 0), m=T, vertices=6, radius=0.07, depth=1.4)
+    prim('cylinder', (13.3, -1.0, 0.95), m=T, vertices=6, radius=0.1, depth=3.9)
+    for k in range(4): prim('ico_sphere', (9.5 + k * 0.35, -0.6, 3.7 + 0.2 * (k % 2)), m=mat('#2F6E2B', 0.8), subdivisions=1, radius=0.8)
+
+PERCH = V(13.3, -1.0, 3.12)
+def snake_on_branch(t, l1=0.0, l2=0.0, l2dir=V(0, 0, 0), lift=0.0):
+    pts = []
+    for i in range(Snake.N):
+        u = i / (Snake.N - 1)
+        p = V(10.2 + u * 1.55 + 0.05 * math.sin(u * 9 + t * 2) * (1 - u), -1.0 + 0.05 * math.sin(u * 12 + t * 1.5), 3.04)
+        p.z += 0.25 * lift * sm((u - 0.8) / 0.2)
+        p += V(1.2, 0, 0.15) * (l1 * sm((u - 0.5) / 0.5))
+        p += l2dir * (l2 * sm((u - 0.55) / 0.45))
+        pts.append(p)
+    return pts
 
 def B5():
     rnd, tufts, beam, bt, tourist, captain, girl = common((3, -24))
-    gz = ground_z(4.5, 6); branch_set(gz)
-    sn = Snake(L=1.6); bird = Bird(1.0); cam, tgt = make_cam(32)
+    branch_set(); sn = Snake(L=1.6); bird = Bird(1.0); cam, tgt = make_cam(32)
     def anim(t):
         sea_time(t + 41)
-        ext = sm((t - 2.4) / 1.0); pts = []
-        for i in range(Snake.N):
-            u = i / (Snake.N - 1)
-            pts.append(V(3.7 + u * 1.55 + 0.06 * math.sin(u * 9 + t * 2) * (1 - u), 6 + 0.06 * math.sin(u * 12 + t * 1.5),
-                         gz + 2.39 + 0.25 * ext * sm((u - 0.8) / 0.2)))
-        sn.set(pts, tongue=1.0 if math.sin(t * 7) > 0.3 else 0.0)
+        sn.set(snake_on_branch(t, lift=sm((t - 2.4) / 1.0)), tongue=1.0 if math.sin(t * 7) > 0.3 else 0.0)
         if t < 2.0:
-            u = sm(t / 2.0); bird.set(V(14, 2, gz + 6).lerp(V(7.6, 6, gz + 2.62), u), yaw=PI / 2 + 0.3, flap=t * 22, pitch=-0.2 * (1 - u))
-        else: bird.set(V(7.6, 6, gz + 2.62), yaw=PI / 2, fold=1.0, pitch=0.05 * math.sin(t * 3))
+            u = sm(t / 2.0); bird.set(V(17.5, 3.0, 6.5).lerp(PERCH, u), yaw=PI / 2 + 0.5 * (1 - u), flap=t * 22, pitch=-0.25 * (1 - u))
+        else: bird.set(PERCH, yaw=PI / 2, fold=1.0, pitch=0.05 * math.sin(t * 3))
         u = sm(t / 5.2)
-        cam.location = V(5.6, 1.5, gz + 2.6).lerp(V(5.4, 3.2, gz + 2.5), u); tgt.location = V(6.1, 6, gz + 2.4)
+        cam.location = V(12.2, -6.6, 3.4).lerp(V(12.3, -5.4, 3.2), u); tgt.location = V(12.35, -1.0, 3.0)
     return anim
 
 def B6():
     rnd, tufts, beam, bt, tourist, captain, girl = common((3, -24))
-    gz = ground_z(4.5, 6); branch_set(gz)
-    sn = Snake(L=1.6); bird = Bird(1.0); cam, tgt = make_cam(32)
+    branch_set(); sn = Snake(L=1.6); bird = Bird(1.0); cam, tgt = make_cam(32)
+    camC = V(12.7, -2.2, 3.25)
     def anim(t):
         sea_time(t + 47)
-        l1 = sm((t - 0.6) / 0.18) * (1 - sm((t - 1.2) / 0.5)); l2 = sm((t - 5.3) / 0.15); pts = []
-        for i in range(Snake.N):
-            u = i / (Snake.N - 1)
-            pts.append(V(3.7 + u * 1.55 + l1 * 1.6 * sm((u - 0.55) / 0.45) + 0.04 * math.sin(u * 9 + t * 2),
-                         6 - l2 * 1.2 * sm((u - 0.6) / 0.4),
-                         gz + 2.39 + 0.25 * sm((u - 0.8) / 0.2) + l1 * 0.25 * sm((u - 0.7) / 0.3) + l2 * 0.15 * sm((u - 0.7) / 0.3)))
-        sn.set(pts, tongue=1.0 if (t > 3.6 and math.sin(t * 8) > 0) else 0.0)
-        if t < 0.75: bird.set(V(7.6, 6, gz + 2.62), yaw=PI / 2, fold=1.0)
+        l1 = sm((t - 0.6) / 0.18) * (1 - sm((t - 1.2) / 0.5))
+        l2 = sm((t - 5.3) / 0.15)
+        head0 = V(11.75, -1.0, 3.29)
+        sn.set(snake_on_branch(t, l1=l1, l2=l2, l2dir=(camC - head0).normalized() * 0.55, lift=1.0),
+               tongue=1.0 if (t > 3.6 and math.sin(t * 8) > 0) else 0.0)
+        if t < 0.72: bird.set(PERCH, yaw=PI / 2, fold=1.0)
         else:
-            u = t - 0.75
-            bird.set(V(7.6 + u * 4.0, 6 + u * 9.0, gz + 2.62 + u * 2.2 - max(0.0, u - 2.2) ** 2 * 0.6), yaw=-0.45, flap=u * 24, pitch=-0.2)
+            u = t - 0.72
+            bird.set(PERCH + V(u * 3.5, u * 7.0, u * 1.8 - max(0.0, u - 2.0) ** 2 * 0.5), yaw=-0.45, flap=u * 24, pitch=-0.2)
         if t < 0.9:
-            cam.location = V(5.6, 2.6, gz + 2.55) + shake(t, 0.62, 0.3, 0.08); tgt.location = V(6.4, 6, gz + 2.5)
+            cam.location = V(12.3, -5.4, 3.3) + shake(t, 0.62, 0.3, 0.08); tgt.location = V(12.4, -1.0, 3.1)
         elif t < 3.6:
-            u = sm((t - 0.9) / 2.7); bpy.context.view_layer.update()
-            cam.location = V(5.6, 2.6, gz + 2.55).lerp(V(6.0, 2.0, gz + 3.2), u); tgt.location = bird.root.matrix_world.translation.copy()
+            bpy.context.view_layer.update()
+            cam.location = V(11.9, -5.2, 3.3).lerp(V(12.4, -6.0, 3.6), sm((t - 0.9) / 2.7))
+            tgt.location = V(12.2, -1.0, 3.1).lerp(bird.root.matrix_world.translation.copy(), sm((t - 0.9) / 0.6))
         else:
-            u = sm((t - 3.6) / 1.4)
-            cam.location = V(5.0, 4.2, gz + 2.7).lerp(V(5.15, 4.9, gz + 2.68), u) + shake(t, 5.3, 0.4, 0.05); tgt.location = V(5.2, 6, gz + 2.65)
+            u = sm((t - 3.6) / 1.5)
+            cam.location = V(13.6, -3.0, 3.4).lerp(camC, u) + shake(t, 5.3, 0.4, 0.04); tgt.location = head0
     return anim
 
 def A4():
