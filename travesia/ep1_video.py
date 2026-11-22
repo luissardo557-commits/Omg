@@ -775,6 +775,13 @@ def frame(c, g, subs):
         a = sm((g - 0.2) / 0.3) * (1 - sm((g - 2.8) / 0.4))
         text(c, 'LA GRAN TRAVESÍA DE AMÉRICA', W / 2, 250, 54, '#FFD23F', alpha=a)
         text(c, 'EPISODIO 1: EL DESAFÍO', W / 2, 320, 40, '#FFFFFF', alpha=a)
+    for (a, b, kind, label) in ((T['s3a'], T['s3b'], 'barco', 'RUTA 1: BARCO'), (T['s3b'], T['s3c'], 'avion', 'RUTA 2: AVIÓN'),
+                                (T['s3c'], T['s4'], 'nadar', 'RUTA 3: NADAR')):
+        b = a + 2.2
+        if a <= g < b:
+            k = eo((g - a) / 0.3) * (1 - sm((g - (b - 0.3)) / 0.3))
+            route_icon(c, kind, 175, 300, 88 * (0.5 + 0.5 * k), k)
+            text(c, label, 300, 330, 74, '#FFD23F', alpha=k, anchor='l')
     if g < T['negro']:
         for a, b, ch in subs:
             if a <= g < b: draw_sub(c, ch, g - a)
