@@ -479,14 +479,15 @@ def S11():
     return anim
 
 # ------------------------------------------------------------------ render
-bpy.ops.wm.read_factory_settings(use_empty=True)
-lib3d.MATS.clear(); lib3d.OUTLINE = None
-anim = globals()[SHOT]()
-os.makedirs(OUT, exist_ok=True)
-sc = bpy.context.scene
-n = int(round(SHOTS[SHOT] * FPS))
-for f in range(FSTART, min(FEND, n)):
-    anim(f / FPS)
-    bpy.context.view_layer.update()
-    sc.render.filepath = os.path.join(OUT, 'f%04d.jpg' % f)
-    bpy.ops.render.render(write_still=True)
+if __name__ == '__main__':
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    lib3d.MATS.clear(); lib3d.OUTLINE = None
+    anim = globals()[SHOT]()
+    os.makedirs(OUT, exist_ok=True)
+    sc = bpy.context.scene
+    n = int(round(SHOTS[SHOT] * FPS))
+    for f in range(FSTART, min(FEND, n)):
+        anim(f / FPS)
+        bpy.context.view_layer.update()
+        sc.render.filepath = os.path.join(OUT, 'f%04d.jpg' % f)
+        bpy.ops.render.render(write_still=True)
